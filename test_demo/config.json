@@ -1,0 +1,162 @@
+[
+    {
+        "type": "detect",
+        "id": "detect left hand",
+        "bodyPart": [
+            "leftHand"
+        ],
+        "start": true,
+        "command": "",
+        "nextTasks": [
+            {
+                "operate": "start",
+                "id": "match left hand 1up"
+            },
+            {
+                "operate": "start",
+                "id": "match left hand 2up"
+            },
+            {
+                "operate": "start",
+                "id": "match left hand 5up"
+            },
+            {
+                "operate": "stop",
+                "id": "detect left hand"
+            }
+        ]
+    },
+    {
+        "type": "match",
+        "id": "match left hand 1up",
+        "bodyPart": [
+            "leftHand"
+        ],
+        "poseFile": [
+            "./leftHand1up.json"
+        ],
+        "sensetive": [
+            1
+        ],
+        "frames": [
+        30
+    ],
+        "start": false,
+        "command": "",
+        "nextTasks": [
+            {
+                "operate":"start",
+                "id": "start screen recording"
+            },
+            {
+                "operate": "stop",
+                "id": "match left hand 1up"
+            }
+        ]
+    },
+    {
+        "type": "match",
+        "id": "match left hand 2up",
+        "bodyPart": [
+            "leftHand"
+        ],
+        "poseFile": [
+            "./leftHand2up.json"
+        ],
+        "sensetive": [
+            1
+        ],
+        "frames": [
+        30
+    ],
+        "start": false,
+        "command": "",
+        "nextTasks": [
+            {
+                "operate":"start",
+                "id": "stop screen recording"
+            },
+            {
+                "operate": "stop",
+                "id": "match left hand 1up"
+            }
+        ]
+    },
+    {
+        "type": "match",
+        "id": "match left hand 5up",
+        "bodyPart": [
+            "leftHand"
+        ],
+        "poseFile": [
+            "./leftHand5up.json"
+        ],
+        "sensetive": [
+            1
+        ],
+        "frames": [
+        30
+    ],
+        "start": false,
+        "command": "",
+        "nextTasks": [
+            {
+                "operate":"start",
+                "id": "screenshot"
+            },
+            {
+                "operate": "stop",
+                "id": "match left hand 1up"
+            }
+        ]
+    },
+    {
+        "type":"command",
+        "id": "start screen recording",
+        "command":["python ./scripts/startRecord.py"],
+        "start":false,
+        "nextTasks":[
+            {
+            "operate": "start",
+            "id": "detect left hand"
+            },
+            {
+            "operate": "stop",
+            "id": "start screen recording"
+            }
+        ]
+    },
+    {
+        "type":"command",
+        "id": "stop screen recording",
+        "command":["python ./scripts/stopRecord.py"],
+        "start":false,
+        "nextTasks":[
+            {
+            "operate": "start",
+            "id": "detect left hand"
+            },
+            {
+            "operate": "stop",
+            "id": "stop screen recording"
+            }
+        ]
+    },
+    {
+        "type":"command",
+        "id": "screenshot",
+        "command":["python ./scripts/getScreenshot.py"],
+        "start":false,
+        "nextTasks":[
+            {
+            "operate": "start",
+            "id": "detect left hand"
+            },
+            {
+            "operate": "stop",
+            "id": "screenshot"
+            }
+        ]
+    }
+
+]
