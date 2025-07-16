@@ -86,6 +86,7 @@
 - [延时任务](#延时任务)
 - [检测任务](#检测任务)
 - [`socket`监听](#socket监听)
+- [`http`请求](#http请求)
 
 ### 执行命令
 
@@ -265,10 +266,10 @@
 ```c++
 {
     "type":"socketsend", // 任务类型
-    "id":"id", // 任务id(唯一)
+    "id":"id", // 任务 id (唯一)
     "ip":"xxx.xxx.xxx.xxx", // 目标 ip 或主机名
     "port":11111, // 目标端口
-    "extra":{...}, // 该字段将在包里的 "extra" 字段中出现
+    "extra":{...}, // 该字段将在包里的 "extra" 字段中出现(可选)
     "start":true/false, // 任务是否初始启动
     "nextTasks":[ // 运行指令之后对任务激活状态进行修改
         {
@@ -308,3 +309,56 @@
 ```
 
 在被其他任务终止之后或连接出错的时候发送一次`quit\0`并关闭`tcp`连接，同时执行`nextTasks`里的操作
+
+### `http`请求
+
+`http`请求任务用于在特定位置发送`http`请求或将检测到的姿态通过`http`发送出去\
+示例如下:
+
+```c++
+{
+    "type":"request", // 任务类型
+    "id":"id", // 任务id(唯一)
+    "url":"xxx.xxx.xxx.xxx:xxx/xxx/xxx?xxx=xxx&xxx=xxx", // 目标 url
+    "method":"HEAD"/"GET"/"POST"/"PUT"/"PATCH"/"DELETE", // http 请求方式
+    "data":{...}, // 用于 post/put/patch (可选)
+    "headers":{...}, // 请求头 (可选)
+    "cookies":{...}, // cookies 信息 (可选)
+    "start":true/false, // 任务是否初始启动
+    "nextTasks":[ // 运行指令之后对任务激活状态进行修改
+        {
+            "operate":"start"/"stop", // 启动/停止任务
+            "id":"id" // 目标任务 id
+        },
+        ...
+    ]
+}
+```
+
+你可以在`data`中使用`"${pose}"`，它将被替换成如下信息：
+
+```js
+{
+    "pose":{ // 姿态状态，与 GetPoseJson.py 生成的 json 相同
+        "body":[
+            [x,y,z],
+            ...
+        ]/null,
+        "rightHand":[
+            [x,y,z],
+            ...
+        ]/null,
+        "leftHand":[
+            [x,y,z],
+            ...
+        ]/null,
+        "face":[
+            [x,y,z],
+            ...
+        ]/null,
+    },
+    "time":time // posix 时间戳，float 类型
+}
+```
+
+执行`nextTasks`里的操作

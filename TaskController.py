@@ -84,6 +84,15 @@ class TaskController:
                                             task.get('extra', None),
                                             task.get('nextTasks', []),
                                             task.get('start', False))
+            elif taskType == "request":
+                taskObject = RequestTask(self, task['id'],
+                                            task['url'],
+                                            task['port'],
+                                            task.get('data', {}),
+                                            task.get('headers', {}),
+                                            task.get('cookies', {}),
+                                            task.get('nextTasks', []),
+                                            task.get('start', False))
             self.addTask(taskObject)
 
     def startListen(self, targetFPS, modelComplexity):

@@ -27,7 +27,7 @@ class SocketSendTask(Task):
             errorCount += 1
         elif not task['port'] in range(65536):
             print(
-                f"Type Error: 'port' expects an int between 0 and 65535, but found a {type(task['timeout'])}({task['timeout']}) instead"
+                f"Type Error: 'port' expects an int between 0 and 65535, but found {task['port']} instead"
             )
             errorCount += 1
 
