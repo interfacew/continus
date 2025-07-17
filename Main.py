@@ -7,7 +7,7 @@ def showHelp():
     print("Usage:")
     print("\tMain.py -h | --help")
     print(
-        "\tMain.py [--fps=<fps>] [--complexity=0|1|2] [--data=\"<path to data>\"]"
+        "\tMain.py [--fps=<fps>] [--complexity=0|1|2] [--data=\"<path to data>\"] [--cvshow]"
     )
     print("")
     print("Options:")
@@ -21,15 +21,17 @@ def showHelp():
     print(
         "\t--data=\"<path to data>\"\tuse config file in folder <path to data> [default: \"./data\"]"
     )
+    print(
+        "\t--cvshow\t\tuse opencv to display camera view"
+    )
 
 if __name__ == "__main__":
     fps = 8
     complexity = 2
     dataDir = "./data"
-    envCheck = True
-    envDownload = True
+    cvShow = False
     opts, _ = getopt.getopt(sys.argv[1:], 'h', [
-        'fps=', 'complexity=', 'help', 'data='
+        'fps=', 'complexity=', 'help', 'data=','cvshow'
     ])
     for name, value in opts:
         if name in ['-h', '--help']:
@@ -55,6 +57,8 @@ if __name__ == "__main__":
                 exit(0)
         elif name == '--data':
             dataDir = value
+        elif name=='--cvshow':
+            cvShow=True
 
     logging.basicConfig(
         level=logging.INFO,
@@ -99,4 +103,4 @@ if __name__ == "__main__":
     logging.info(f"use fps limit {fps}, model complexity {complexity}")
     controller = TaskController()
     controller.readConfig("config.json")
-    controller.startListen(fps, complexity)
+    controller.startListen(fps, complexity,cvShow)

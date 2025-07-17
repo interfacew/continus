@@ -97,8 +97,8 @@ class TaskController:
                                             task.get('start', False))
             self.addTask(taskObject)
 
-    def startListen(self, targetFPS, modelComplexity):
-        camera = cv.VideoCapture(0, cv.CAP_DSHOW)
+    def startListen(self, targetFPS, modelComplexity,cvShow):
+        camera = cv.VideoCapture(0)
         camera.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
         camera.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
         camera.set(cv.CAP_PROP_FPS, 60)
@@ -108,48 +108,64 @@ class TaskController:
                 min_detection_confidence=0.5,
                 min_tracking_confidence=0.5,
                 model_complexity=modelComplexity) as holistic:
-            while camera.isOpened():
-                ret, frame = camera.read()
-                waitTime = 1
-                if ret:
-                    start = time.time() * 1e3
+            logging.info("mediapipe started.")
+            try:
+                while camera.isOpened():
+                    ret, frame = camera.read()
+                    logging.info("camera started.")
+                    waitTime = 1
+                    if ret:
+                        start = time.time() * 1e3
 
-                    frame = frame[:, ::-1, :]
-                    image = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-                    image.flags.writeable = False
-                    results = holistic.process(image)
-                    image.flags.writeable = True
-                    image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-                    drawLandmarks(image, results)
+                        frame = frame[:, ::-1, :]
+                        image = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+                        image.flags.writeable = False
+                        results = holistic.process(image)
+                        image.flags.writeable = True
+                        image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+                        drawLandmarks(image, results)
 
-                    if framecnt >= self.FPS_COUNT_FRAME * 3:
-                        self.listen(extractLandmarks(results))
+                        if framecnt >= self.FPS_COUNT_FRAME * 3:
+                            self.listen(extractLandmarks(results))
 
-                    now = time.time() * 1e3
-                    if framecnt >= self.FPS_COUNT_FRAME:
-                        last = q.pop()
-                        cv.putText(
-                            image,
-                            f"FPS: {self.FPS_COUNT_FRAME*1e3/(now-last):.3f}",
-                            (10, 30),
-                            cv.FONT_HERSHEY_COMPLEX,
-                            1.0, (255, 0, 0),
-                            bottomLeftOrigin=False)
-                        if targetFPS != 0:
-                            waitTime = max(
-                                1,
-                                math.floor(1e3 / targetFPS - (now - start)) -
-                                3)
-                        else:
-                            waitTime = 1
-                    q.appendleft(now)
-
-                    cv.imshow('OpenCV Feed', image)
-                    framecnt += 1
-
-                if cv.waitKey(waitTime) & 0xFF == ord('q'):
-                    for task in self.tasks.keys():
-                        self.deactivateTask(task, generateNullLandmarks())
+                        now = time.time() * 1e3
+                        if framecnt >= self.FPS_COUNT_FRAME:
+                            last = q.pop()
+                            logging.info(f"FPS: {self.FPS_COUNT_FRAME*1e3/(now-last):.3f}")
+                            if cvShow:
+                                cv.putText(
+                                    image,
+                                    f"FPS: {self.FPS_COUNT_FRAME*1e3/(now-last):.3f}",
+                                    (10, 30),
+                                    cv.FONT_HERSHEY_COMPLEX,
+                                    1.0, (255, 0, 0),
+                                    bottomLeftOrigin=False)
+                            if targetFPS != 0:
+                                waitTime = max(
+                                    1,
+                                    math.floor(1e3 / targetFPS - (now - start)) -
+                                    3)
+                            else:
+                                waitTime = 1
+                        q.appendleft(now)
+                        if cvShow:
+                            cv.imshow('OpenCV Feed', image)
+                        framecnt += 1
+                    if cvShow:
+                        if cv.waitKey(waitTime) & 0xFF == ord('q'):
+                            for task in self.tasks.keys():
+                                self.deactivateTask(task, generateNullLandmarks())
+                                break
+                    else:
+                        time.sleep(waitTime/1000)
+            except KeyboardInterrupt:
+                for task in self.tasks.keys():
+                    self.deactivateTask(task, generateNullLandmarks())
                     break
+                camera.release()
+                if cvShow:
+                    cv.destroyAllWindows()
+
             camera.release()
-            cv.destroyAllWindows()
+            if cvShow:
+                cv.destroyAllWindows()
