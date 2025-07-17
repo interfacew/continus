@@ -1,5 +1,14 @@
 from .Task import Task
-import requests
+try:
+    import requests
+except ModuleNotFoundError:
+    print("Warning: cannot found module 'requests', ignore all keytask.")
+    print("         use 'pip install requests==2.32.4' to install")
+    class _dummy:
+        @classmethod
+        def request(*args):
+            pass
+    requests=_dummy
 import json
 from datetime import datetime
 
