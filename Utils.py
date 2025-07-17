@@ -112,7 +112,7 @@ def testPackages(download=True):
         logging.error("Missing package numpy")
         flag4 = True
 
-    if download and (flag1 or flag2 or flag3):
+    if download and (flag1 or flag2 or flag3 or flag4):
         try:
             logging.info(
                 "Downloading" +
@@ -135,4 +135,4 @@ def testPackages(download=True):
         else:
             logging.info("Download Complete")
 
-    return not (flag1 or flag2 or flag3)
+    return not (flag1 or flag2 or flag3 or flag4)
