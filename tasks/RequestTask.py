@@ -71,7 +71,7 @@ class RequestTask(Task):
         self.headers = headers
         self.cookies = cookies
 
-    def formatData(self,data:dict|list,pose:str)->dict|list:
+    def formatData(self,data,pose:str):
         if type(data)==list:
             for i in range(len(data)):
                 if type(data[i])==str :
