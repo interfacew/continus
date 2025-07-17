@@ -60,23 +60,24 @@ if __name__ == "__main__":
         elif name=='--cvshow':
             cvShow=True
 
+    if not os.path.exists(dataDir):
+        os.mkdir(dataDir)
+    configPath = os.path.join(dataDir, "config.json")
+    if not os.path.exists(os.path.join(dataDir, "error.log")):
+        with open(os.path.join(dataDir, "error.log"), "w") as f:
+            f.write("")
+
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s [%(levelname)s] %(message)s',
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler(f"{dataDir}/error.log", encoding='utf-8')
+            logging.FileHandler(os.path.join(dataDir, "error.log"), encoding='utf-8')
         ]
     )
-
-    from TaskController import TaskController
-    from ValidateConfig import ValidateConfig
     import mediapipe.python.solutions as sol
 
     logging.info(f"working in folder {dataDir}")
-    if not os.path.exists(dataDir):
-        os.mkdir(dataDir)
-    configPath = os.path.join(dataDir, "config.json")
     if not os.path.exists(configPath):
         with open(configPath, "w") as f:
             f.write("[]")
@@ -96,9 +97,13 @@ if __name__ == "__main__":
         logging.info(f"Now you can modify {configPath} to custom your own task list")
         exit(0)
 
+    from ValidateConfig import ValidateConfig
+
     os.chdir(dataDir)
     if not ValidateConfig("config.json"):
         exit(0)
+
+    from TaskController import TaskController
 
     logging.info(f"use fps limit {fps}, model complexity {complexity}")
     controller = TaskController()
