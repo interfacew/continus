@@ -3,6 +3,7 @@ import threading
 import subprocess
 import sys
 import json
+import logging
 
 
 class CommandTask(Task):
@@ -13,10 +14,10 @@ class CommandTask(Task):
         flag1, flag2 = False, False
 
         if not 'command' in task.keys():
-            print("Key Error: missing key 'command'")
+            logging.error("Key Error: missing key 'command'")
             errorCount += 1
         elif type(task['command']) != list:
-            print(
+            logging.error(
                 f"Type Error: 'command' expects a list, but found a {type(task['command'])}({task['command']}) instead"
             )
             errorCount += 1
@@ -24,16 +25,16 @@ class CommandTask(Task):
             flag1 = True
             for i, command in enumerate(task['command']):
                 if type(command) != str:
-                    print(
+                    logging.error(
                         f"command[{i}] Type Error: expects a string, but found a {type(command)}({command}) instead"
                     )
                     errorCount += 1
 
         if not 'timeout' in task.keys():
-            print("Warning: missing key 'timeout', use [] as default")
+            logging.warning("Warning: missing key 'timeout', use [] as default")
             warningCount += 1
         elif type(task['timeout']) != list:
-            print(
+            logging.error(
                 f"Type Error: 'timeout' expects a list, but found a {type(task['timeout'])}({task['timeout']}) instead"
             )
             errorCount += 1
@@ -41,13 +42,13 @@ class CommandTask(Task):
             flag2 = True
             for i, timeout in enumerate(task['timeout']):
                 if not type(timeout) in [int, float]:
-                    print(
+                    logging.error(
                         f"timeout[{i}] Type Error: expects an int or float, but found a {type(timeout)}({timeout}) instead"
                     )
                     errorCount += 1
 
         if flag1 and flag2 and len(task['timeout']) != len(task['command']):
-            print(
+            logging.warning(
                 "Warning: the lengths of 'command' array and 'timeout' array do not match"
             )
             warningCount += 1
@@ -69,10 +70,10 @@ class CommandTask(Task):
         self.thread = None
 
     def runCommand(self, command, timeout, x):
-        print(f"run command in task {self.id}")
+        logging.info(f"run command in task {self.id}")
         _x = json.dumps(x).replace(' ', '')
         for i, c in enumerate(command):
-            print(f"\t running command {c}")
+            logging.info(f"\t running command {c}")
             cmd = ""
             last = ''
             for j in c:
@@ -96,15 +97,15 @@ class CommandTask(Task):
                     capture_output=True,
                     timeout=(None if timeout[i] == 0 else timeout[i]))
             except subprocess.TimeoutExpired:
-                print(
+                logging.error(
                     f"[command] Timeout when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}",
                     file=sys.stderr)
             except OSError:
-                print(
+                logging.error(
                     f"[command] Error when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}",
                     file=sys.stderr)
             if res.returncode != 0:
-                print(
+                logging.error(
                     f"[command] Error when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}",
                     file=sys.stderr)
 

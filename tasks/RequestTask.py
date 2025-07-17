@@ -1,9 +1,10 @@
 from .Task import Task
+import logging
 try:
     import requests
 except ModuleNotFoundError:
-    print("Warning: cannot found module 'requests', ignore all keytask.")
-    print("         use 'pip install requests==2.32.4' to install")
+    logging.warning("Warning: cannot found module 'requests', ignore all keytask.")
+    logging.warning("         use 'pip install requests==2.32.4' to install")
     class _dummy:
         @classmethod
         def request(*args):
@@ -19,37 +20,37 @@ class RequestTask(Task):
         errorCount, warningCount = super().validate(task, ids, sameIds)
 
         if not 'url' in task.keys():
-            print("KeyError: missing key 'url'")
+            logging.error("KeyError: missing key 'url'")
             errorCountCount += 1
         elif type(task['url']) != str:
-            print(
+            logging.error(
                 f"Type Error: 'url' expects a string, but found a {type(task['url'])}({task['url']}) instead"
             )
             errorCount += 1
 
         if not 'method' in task.keys():
-            print("KeyError: missing key 'method'")
+            logging.error("KeyError: missing key 'method'")
             errorCount += 1
         elif not task['method'] in ["HEAD","GET","POST","PUT","PATCH","DELETE"]:
-            print(
+            logging.error(
                 f"ValueError: 'port' expects a http method, but found {task['timeout']} instead"
             )
             errorCount += 1
         elif task['method'] in ["POST","PUT","PATCH"]:
             if not 'data' in task.keys():
-                print("Warning: missing key 'data', use null as default")
+                logging.warning("Warning: missing key 'data', use null as default")
                 warningCount+=1
 
         if not 'headers' in task.keys():
-            print("Warning: missing key 'headers', use null as default")
+            logging.warning("Warning: missing key 'headers', use null as default")
             warningCount+=1
 
         if not 'cookies' in task.keys():
-            print("Warning: missing key 'cookies', use null as default")
+            logging.warning("Warning: missing key 'cookies', use null as default")
             warningCount+=1
 
         if not 'extra' in task.keys():
-            print("Warning: missing key 'extra', use null as default")
+            logging.warning("Warning: missing key 'extra', use null as default")
             warningCount += 1
 
         return errorCount, warningCount
@@ -90,7 +91,7 @@ class RequestTask(Task):
 
     def activate(self, x):
         now = datetime.now().timestamp()
-        print(f"time {now}")
+        logging.info(f"time {now}")
         pose=json.dumps({"pose": x, "time": now})
         requests.request(self.method,self.url,headers=self.headers,cookies=self.cookies,data=self.formatData(self.data,pose))
         self.process(x)

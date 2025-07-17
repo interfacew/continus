@@ -1,5 +1,6 @@
 from datetime import datetime
 from .Task import Task
+import logging
 
 
 class TimeoutTask(Task):
@@ -9,10 +10,10 @@ class TimeoutTask(Task):
         errorCount, warningCount = super().validate(task, ids, sameIds)
 
         if not 'timeout' in task.keys():
-            print("KeyError: missing key 'timeout'")
+            logging.error("KeyError: missing key 'timeout'")
             errorCount += 1
         elif not type(task['timeout']) in [int, float]:
-            print(
+            logging.error(
                 f"Type Error: 'timeout' expects an int or float, but found a {type(task['timeout'])}({task['timeout']}) instead"
             )
             errorCount += 1
@@ -36,7 +37,7 @@ class TimeoutTask(Task):
         self.activateTime = -1
 
     def _listen(self, x):
-        print(
+        logging.info(
             f"time last {self.timeout-(datetime.now().timestamp()*1000-self.activateTime)}"
         )
         if datetime.now().timestamp(

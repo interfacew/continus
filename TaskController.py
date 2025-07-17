@@ -6,6 +6,7 @@ import mediapipe.python.solutions as sol
 import time
 from collections import deque
 import math
+import logging
 
 
 class TaskController:
@@ -16,21 +17,22 @@ class TaskController:
         self.activate = {}
 
     def listen(self, x):
-        print("\033[H\033[J")
+        logging.info("\033[H\033[J")
+        
         for i in self.tasks.keys():
             if self.activate[i]:
                 self.tasks[i].listen(x)
 
     def activateTask(self, id: str, x):
         if not id in self.activate.keys():
-            print(f"Unknown task id {id}")
+            logging.error(f"Unknown task id {id}")
             return
         self.activate[id] = True
         self.tasks[id].activate(x)
 
     def deactivateTask(self, id: str, x):
         if not id in self.activate.keys():
-            print(f"Unknown task id {id}")
+            logging.error(f"Unknown task id {id}")
             return
         self.activate[id] = False
         self.tasks[id].deactivate(x)

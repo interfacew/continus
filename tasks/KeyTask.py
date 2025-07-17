@@ -1,9 +1,10 @@
 from .Task import Task
+import logging
 try:
     import pyautogui
 except ModuleNotFoundError:
-    print("Warning: cannot found module 'pyautogui', ignore all keytask.")
-    print("         use 'pip install PyAutoGUI==0.9.54' to install")
+    logging.warning("Warning: cannot found module 'pyautogui', ignore all keytask.")
+    logging.warning("         use 'pip install PyAutoGUI==0.9.54' to install")
     class _dummy:
         KEYBOARD_KEYS=[
             '\t', '\n', '\r', ' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~',
@@ -29,24 +30,24 @@ class KeyTask(Task):
     def validate(cls, task: dict, ids: list, sameIds: list):
         errorCount, warningCount = super().validate(task, ids, sameIds)
         if not 'keys' in task.keys():
-            print("Key Error: missing key 'keys'")
+            logging.error("Key Error: missing key 'keys'")
             errorCount += 1
         elif type(task['keys']) != list:
-            print(
+            logging.error(
                 f"Type Error: 'keys' expects a list, but found a {type(task['keys'])}({task['keys']}) instead"
             )
             errorCount += 1
         else:
             for i, hotkey in enumerate(task['keys']):
                 if type(hotkey) != list:
-                    print(
+                    logging.error(
                         f"keys[{i}] Type Error: expects a list, but found a {type(hotkey)}({hotkey}) instead"
                     )
                     errorCount += 1
                 else:
                     for j, key in enumerate(hotkey):
                         if not key in pyautogui.KEYBOARD_KEYS:
-                            print(
+                            logging.error(
                                 f"keys[{i}][{j}] Value Error: expects a key in pyautogui.KEYBOARD_KEYS, but found {key} instead"
                             )
         return errorCount, warningCount
@@ -61,7 +62,7 @@ class KeyTask(Task):
         self.keys = keys
 
     def activate(self, x):
-        print(f"press keys in task {self.id}")
+        logging.info(f"press keys in task {self.id}")
         for keyset in self.keys:
             pyautogui.hotkey(*keyset)
         self.process(x)

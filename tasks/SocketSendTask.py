@@ -3,6 +3,7 @@ import socket
 import sys
 import json
 from datetime import datetime
+import logging
 
 
 class SocketSendTask(Task):
@@ -14,25 +15,25 @@ class SocketSendTask(Task):
         errorCount, warningCount = super().validate(task, ids, sameIds)
 
         if not 'ip' in task.keys():
-            print("Warning: missing key 'ip', use \"127.0.0.1\" as default")
+            logging.warning("Warning: missing key 'ip', use \"127.0.0.1\" as default")
             warningCount += 1
         elif type(task['ip']) != str:
-            print(
+            logging.warning(
                 f"Type Error: 'ip' expects a string, but found a {type(task['ip'])}({task['ip']}) instead"
             )
             errorCount += 1
 
         if not 'port' in task.keys():
-            print("KeyError: missing key 'port'")
+            logging.warning("KeyError: missing key 'port'")
             errorCount += 1
         elif not task['port'] in range(65536):
-            print(
+            logging.warning(
                 f"Type Error: 'port' expects an int between 0 and 65535, but found {task['port']} instead"
             )
             errorCount += 1
 
         if not 'extra' in task.keys():
-            print("Warning: missing key 'extra', use null as default")
+            logging.warning("Warning: missing key 'extra', use null as default")
             warningCount += 1
 
         return errorCount, warningCount
@@ -63,7 +64,7 @@ class SocketSendTask(Task):
         self.process(x)
 
     def process(self, x):
-        print(f"processing {self.id}")
+        logging.info(f"processing {self.id}")
         for i in self.nextTasks:
             if i['operate'] == 'start':
                 self.controller.activateTask(i['id'], x)
@@ -76,7 +77,7 @@ class SocketSendTask(Task):
         try:
             self.socket.connect((self.ip, self.port))
         except:
-            print(f"[socket] Can't connect to {self.ip}:{self.port}",
+            logging.warning(f"[socket] Can't connect to {self.ip}:{self.port}",
                   file=sys.stderr)
             self.controller.deactivateTask(self.id, x)
 
@@ -88,7 +89,7 @@ class SocketSendTask(Task):
             try:
                 l = self.socket.send(msg[start:])
             except:
-                print(f"[socket] Can't send message to {self.ip}:{self.port}",
+                logging.warning(f"[socket] Can't send message to {self.ip}:{self.port}",
                       file=sys.stderr)
                 if msg != 'quit\0'.encode('ascii'):
                     self.controller.deactivateTask(self.id, x)
@@ -96,7 +97,7 @@ class SocketSendTask(Task):
             if l == 0:
                 retry += 1
                 if retry > self.MAX_RETRY:
-                    print(
+                    logging.warning(
                         f"[socket] Can't send message to {self.ip}:{self.port}",
                         file=sys.stderr)
                     if msg != 'quit\0'.encode('ascii'):
@@ -107,7 +108,7 @@ class SocketSendTask(Task):
 
     def _listen(self, x):
         now = datetime.now().timestamp()
-        print(f"time {now}")
+        logging.info(f"time {now}")
         _x = json.dumps({"pose": x, "time": now, "extra": self.extra}) + '\0'
         _x = _x.replace(" ", "")
         _x = _x + " " * (self.PACKAGE_LENGTH - len(_x))
