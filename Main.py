@@ -59,16 +59,12 @@ if __name__ == "__main__":
                 exit(0)
         elif name == '--data':
             dataDir = value
-        elif name == '--no-env-check':
-            envCheck = False
-        elif name == '--no-env-download':
-            envDownload = False
 
-    from Utils import testPackages
-    if envCheck:
-        res = testPackages(envDownload)
-        if not (envDownload or res):
-            exit(0)
+    # from Utils import testPackages
+    # if envCheck:
+        # res = testPackages(envDownload)
+        # if not (envDownload or res):
+            # exit(0)
 
     from TaskController import TaskController
     from ValidateConfig import ValidateConfig
