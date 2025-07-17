@@ -10,7 +10,7 @@ class TimeoutTask(Task):
         errorCount, warningCount = super().validate(task, ids, sameIds)
 
         if not 'timeout' in task.keys():
-            logging.error("KeyError: missing key 'timeout'")
+            logging.error("Key Error: missing key 'timeout'")
             errorCount += 1
         elif not type(task['timeout']) in [int, float]:
             logging.error(

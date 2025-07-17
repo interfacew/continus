@@ -3,45 +3,33 @@ import sys
 import getopt
 import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler("data/error.log", encoding='utf-8')
-    ]
-)
-
 def showHelp():
-    logging.info("Usage:")
-    logging.info("\tMain.py -h | --help")
-    logging.info(
-        "\tMain.py [--fps=<fps>] [--complexity=0|1|2] [--data=\"<path to data>\"] [--no-env-check] [--no-env-download]"
+    print("Usage:")
+    print("\tMain.py -h | --help")
+    print(
+        "\tMain.py [--fps=<fps>] [--complexity=0|1|2] [--data=\"<path to data>\"]"
     )
-    logging.info("")
-    logging.info("Options:")
-    logging.info("\t-h --help\t\tshow this help message and exit")
-    logging.info(
+    print("")
+    print("Options:")
+    print("\t-h --help\t\tshow this help message and exit")
+    print(
         "\t--fps=<fps>\t\ttarget fps when tracking (fps>=0, 0 means unlimited) [default: 8]"
     )
-    logging.info(
+    print(
         "\t--complexity=0|1|2\ttrack model complexity (0 for lite, 1 for medium, 2 for heavy) [default: 2]"
     )
-    logging.info(
+    print(
         "\t--data=\"<path to data>\"\tuse config file in folder <path to data> [default: \"./data\"]"
     )
-    logging.info("\t--no-env-check\t\tdo not check environment")
-    logging.info("\t--no-env-download\tdo not download when missing package")
 
 if __name__ == "__main__":
     fps = 8
     complexity = 2
-    dataDir = r".\data"
+    dataDir = "./data"
     envCheck = True
     envDownload = True
     opts, _ = getopt.getopt(sys.argv[1:], 'h', [
-        'fps=', 'complexity=', 'help', 'data=', 'no-env-check',
-        'no-env-download'
+        'fps=', 'complexity=', 'help', 'data='
     ])
     for name, value in opts:
         if name in ['-h', '--help']:
@@ -51,28 +39,31 @@ if __name__ == "__main__":
             try:
                 fps = int(value)
             except:
-                logging.error(f"invalid fps {value}")
+                print(f"invalid fps {value}")
                 exit(0)
             if fps < 0:
-                logging.error(f"invalid fps {value}")
+                print(f"invalid fps {value}")
                 exit(0)
         elif name == '--complexity':
             try:
                 complexity = int(value)
             except:
-                logging.error(f"invalid complexity {value}")
+                print(f"invalid complexity {value}")
                 exit(0)
             if not complexity in [0, 1, 2]:
-                logging.error(f"invalid complexity {value}")
+                print(f"invalid complexity {value}")
                 exit(0)
         elif name == '--data':
             dataDir = value
 
-    # from Utils import testPackages
-    # if envCheck:
-        # res = testPackages(envDownload)
-        # if not (envDownload or res):
-            # exit(0)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler(f"{dataDir}/error.log", encoding='utf-8')
+        ]
+    )
 
     from TaskController import TaskController
     from ValidateConfig import ValidateConfig

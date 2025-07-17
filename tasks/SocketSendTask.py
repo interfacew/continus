@@ -18,16 +18,16 @@ class SocketSendTask(Task):
             logging.warning("Warning: missing key 'ip', use \"127.0.0.1\" as default")
             warningCount += 1
         elif type(task['ip']) != str:
-            logging.warning(
+            logging.error(
                 f"Type Error: 'ip' expects a string, but found a {type(task['ip'])}({task['ip']}) instead"
             )
             errorCount += 1
 
         if not 'port' in task.keys():
-            logging.warning("KeyError: missing key 'port'")
+            logging.error("KeyError: missing key 'port'")
             errorCount += 1
         elif not task['port'] in range(65536):
-            logging.warning(
+            logging.error(
                 f"Type Error: 'port' expects an int between 0 and 65535, but found {task['port']} instead"
             )
             errorCount += 1
@@ -77,8 +77,7 @@ class SocketSendTask(Task):
         try:
             self.socket.connect((self.ip, self.port))
         except:
-            logging.warning(f"[socket] Can't connect to {self.ip}:{self.port}",
-                  file=sys.stderr)
+            logging.warning(f"[socket] Can't connect to {self.ip}:{self.port}")
             self.controller.deactivateTask(self.id, x)
 
     def send(self, msg, x):
@@ -89,8 +88,7 @@ class SocketSendTask(Task):
             try:
                 l = self.socket.send(msg[start:])
             except:
-                logging.warning(f"[socket] Can't send message to {self.ip}:{self.port}",
-                      file=sys.stderr)
+                logging.warning(f"[socket] Can't send message to {self.ip}:{self.port}")
                 if msg != 'quit\0'.encode('ascii'):
                     self.controller.deactivateTask(self.id, x)
                 break
@@ -98,8 +96,7 @@ class SocketSendTask(Task):
                 retry += 1
                 if retry > self.MAX_RETRY:
                     logging.warning(
-                        f"[socket] Can't send message to {self.ip}:{self.port}",
-                        file=sys.stderr)
+                        f"[socket] Can't send message to {self.ip}:{self.port}")
                     if msg != 'quit\0'.encode('ascii'):
                         self.controller.deactivateTask(self.id, x)
             else:

@@ -20,8 +20,8 @@ class RequestTask(Task):
         errorCount, warningCount = super().validate(task, ids, sameIds)
 
         if not 'url' in task.keys():
-            logging.error("KeyError: missing key 'url'")
-            errorCountCount += 1
+            logging.error("Key Error: missing key 'url'")
+            errorCount += 1
         elif type(task['url']) != str:
             logging.error(
                 f"Type Error: 'url' expects a string, but found a {type(task['url'])}({task['url']}) instead"
@@ -29,11 +29,11 @@ class RequestTask(Task):
             errorCount += 1
 
         if not 'method' in task.keys():
-            logging.error("KeyError: missing key 'method'")
+            logging.error("Key Error: missing key 'method'")
             errorCount += 1
         elif not task['method'] in ["HEAD","GET","POST","PUT","PATCH","DELETE"]:
             logging.error(
-                f"ValueError: 'port' expects a http method, but found {task['timeout']} instead"
+                f"Value Error: 'port' expects a http method, but found {task['timeout']} instead"
             )
             errorCount += 1
         elif task['method'] in ["POST","PUT","PATCH"]:

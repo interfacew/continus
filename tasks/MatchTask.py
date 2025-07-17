@@ -65,9 +65,9 @@ class MatchTask(Task):
                         pose = json.loads(f.read())
                         f.close()
                     except OSError:
-                        logging.warning(
-                            f"poseFile[{i}] Warning: can not open file {file}")
-                        warningCount += 1
+                        logging.error(
+                            f"poseFile[{i}] Value Error: can not open file {file}")
+                        errorCount += 1
                         continue
                     except json.JSONDecodeError as e:
                         logging.error(
@@ -185,10 +185,7 @@ class MatchTask(Task):
             newy = (point[1] - (maxy + miny) / 2) / maxDelta
             newz = (point[2] - (maxz + minz) / (maxz - minz) / 4)
             if newx < -0.5 - 1e-8 or newx > 0.5 + 1e-8 or newy < -0.5 - 1e-8 or newy > 0.5 + 1e-8 or newz < -0.125 - 1e-8 or newz > 0.125 + 1e-8:
-                logging.error(
-                    f"NormalizePoints out of range: {[point[0], point[1], point[2], newx, newy, newz, maxDelta, maxx, maxy, minx, miny, maxz, minz]}"
-                )
-                raise ValueError
+                raise ValueError(f"NormalizePoints out of range: {[point[0], point[1], point[2], newx, newy, newz, maxDelta, maxx, maxy, minx, miny, maxz, minz]}")
             res.append([newx, newy, newz])
         return res
 

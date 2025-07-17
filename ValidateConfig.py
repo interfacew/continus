@@ -84,7 +84,7 @@ def ValidateConfig(path):
 
 
 if __name__ == "__main__":
-    data_dir = r".\data"
+    data_dir = "./data"
     if not os.path.exists(data_dir):
         logging.error("folder not found")
         exit(0)

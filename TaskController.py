@@ -17,8 +17,8 @@ class TaskController:
         self.activate = {}
 
     def listen(self, x):
-        logging.info("\033[H\033[J")
-        
+        print("\033[H\033[J")
+
         for i in self.tasks.keys():
             if self.activate[i]:
                 self.tasks[i].listen(x)

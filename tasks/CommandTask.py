@@ -97,17 +97,11 @@ class CommandTask(Task):
                     capture_output=True,
                     timeout=(None if timeout[i] == 0 else timeout[i]))
             except subprocess.TimeoutExpired:
-                logging.error(
-                    f"[command] Timeout when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}",
-                    file=sys.stderr)
+                logging.error(f"[command] Timeout when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}")
             except OSError:
-                logging.error(
-                    f"[command] Error when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}",
-                    file=sys.stderr)
+                logging.error(f"[command] Error when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}")
             if res.returncode != 0:
-                logging.error(
-                    f"[command] Error when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}",
-                    file=sys.stderr)
+                logging.error(f"[command] Error when processing {cmd}\nstdout={res.stdout}\nstderr={res.stderr}")
 
     def activate(self, x):
         self.thread = threading.Thread(target=self.runCommand,
